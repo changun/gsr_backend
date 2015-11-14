@@ -5,12 +5,20 @@
         org.httpkit.server))
 
 
+(defn process [data]
+  (println data)
+  (send! channel data)
+  )
 
 (defn handler [request]
+  (println request)
   (with-channel request channel
+                (if (websocket? channel)
+                  (println "WebSocket channel")
+                  (println "HTTP channel"))
+                (on-receive channel process)
                 (on-close channel (fn [status] (println "channel closed, " status)))
-                (on-receive channel (fn [data]
-                                      (send! channel data)))))
+                ))
 
 
 
