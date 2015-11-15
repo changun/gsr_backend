@@ -10,4 +10,5 @@
                  [clj-time "0.11.0"]
                  [cheshire "5.5.0"]
                  [ring/ring-codec "1.0.0"]
+                 [com.novemberain/monger "3.0.0-rc2"]
                  ])
