@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.7.0/metricsgraphics.min.css' rel='stylesheet' type='text/css'>
+    <style>
+        .mg-markers text.mail-label {
+            fill: darkred;
+        }
+        .mg-markers text.browser-label {
+            fill: dimgrey;
+        }
+    </style>
+</head>
+<body>
+<div id="gsr" style="margin-top: 5%"></div>
+</body>
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.0/d3.min.js' charset='utf-8'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.7.0/metricsgraphics.js' charset='utf-8'></script>
+<script>
+    var datUrl = "http://lifestreams.smalldata.io/gsr/query";
+    var template = {
+        title: "GSR-Email",
+        description: "The user's galvanic skin response (GSR) in response to email sending events.",
+        mouseover: function(d, i) {
+            d3.select('#gsr svg .mg-active-datapoint')
+                    .text(d.time + ' GSR: ' + d.reading);
+        },
+        width: $("body").width(),
+        height: 500,
+        target: "#gsr",
+        x_accessor: "time",
+        y_accessor: "reading",
+        interpolate: "monotone",
+        transition_on_update: false
+
+    };
+    var update = function(data){
+        template.data = data.gsr.map(function(d){
+            d.time = new Date(d.time);
+            return d;
+        });
+        if(data.mail) {
+            template.markers = data.mail.map(function (m) {
+                var subject = m.payload.headers.filter(
+                        function (h) {
+                            return h.name.toLocaleLowerCase() == "subject";
+                        })[0].value;
+
+                return {
+                    "time": new Date(m.time),
+                    "label": subject,
+                    "textclass": "mail-label"
+                };
+
+            });
+        }
+        if(data["browser-history"]){
+            var histories = data["browser-history"].map(function(m){
+                return {
+                    "time" : new Date(m.time),
+                    "label": m.title,
+                    "textclass" : "browser-label"
+                };
+
+            });
+            var compactHistories = [];
+            var lastTitle, lastTime;
+            histories.forEach(function(h){
+                if(!lastTitle ||  (h.title != lastTitle || h.time.valueOf() - 3000 >  lastTime.valueOf())){
+                    compactHistories.push(h);
+                    lastTitle = h.title;
+                    lastTime = h.time;
+                }
+            });
+            template.markers = template.markers.concat(compactHistories);
+        }
+
+        MG.data_graphic(template);
+    };
+    d3.json(datUrl, function(data) {
+        update(data);
+    });
+
+    setInterval(function(){
+        d3.json(datUrl, function(data) {
+            update(data);
+        });
+    }, 1000);
+
+
+</script>
+
+</html>
