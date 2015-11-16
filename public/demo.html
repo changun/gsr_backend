@@ -5,10 +5,10 @@
     <title></title>
     <link href='https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.7.0/metricsgraphics.min.css' rel='stylesheet' type='text/css'>
     <style>
-        .mg-markers text.mail-label {
+        .mg-markers .mail-label {
             fill: darkred;
         }
-        .mg-markers text.browser-label {
+        .mg-markers .browser-label {
             fill: dimgrey;
         }
     </style>
@@ -52,7 +52,8 @@
                 return {
                     "time": new Date(m.time),
                     "label": subject,
-                    "textclass": "mail-label"
+                    "textclass": "mail-label",
+                    "lineclass": "mail-label"
                 };
 
             });
@@ -62,7 +63,8 @@
                 return {
                     "time" : new Date(m.time),
                     "label": m.title,
-                    "textclass" : "browser-label"
+                    "textclass" : "browser-label",
+                    "lineclass": "browser-label"
                 };
 
             });
