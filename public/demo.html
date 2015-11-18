@@ -185,8 +185,8 @@
     setInterval(function(){
         var start = moment(new Date().valueOf() + timeOffset);
         var end = new Date() - startTime + start + 300000;
-
-        d3.json(datUrl + "?" + "start="+ start +"&end=" + end , function(data) {
+        var query =  timeOffset ? "?" + "start="+ start +"&end=" + end : "";
+        d3.json(datUrl + query, function(data) {
             update(data);
         });
     }, 1000);
